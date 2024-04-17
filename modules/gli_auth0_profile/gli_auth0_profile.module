@@ -25,30 +25,6 @@ function gli_auth0_profile_form_user_form_alter(array &$form, FormStateInterface
   $auth0Id = $auth0Service->getUserAuth0Id($user->id());
 
   if ($auth0Id !== NULL) {
-
-    $form['profile_page'] = [
-      '#type' => 'inline_template',
-      '#template' => '
-        <div style="margin-top: 1rem;">
-            <a href="{{ profile_edit }}" style="font-size: 1.25rem; color: red; text-decoration: underline;">{{ "Update Profile Information" | t }}</a>
-        </div>
-      ',
-      '#context' => [
-        'profile_edit' => Url::fromRoute(
-          'gli_auth0_profile.profile_update',
-          [
-            'user' => $user->id(),
-          ],
-          [
-            'https' => TRUE,
-            'absolute' => TRUE,
-          ]
-        )->toString(),
-      ],
-      '#weight' => -9,
-      '#access' => FALSE,
-    ];
-
     $form['account']['description_email'] = [
       '#type' => 'markup',
       '#weight' => -101,
