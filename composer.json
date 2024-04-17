@@ -3,6 +3,7 @@
     "description": "GLI Auth0 Integration",
     "type": "drupal-module",
     "require": {
-        "auth0/auth0-php": "^8.2"
+        "auth0/auth0-php": "^8.2",
+        "drupal/masquerade": "^2.0"
     }
 }

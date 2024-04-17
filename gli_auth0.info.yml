@@ -1,6 +1,9 @@
 name: 'GLI Auth0 Integration'
 type: module
 description: 'GLI Auth0 Integration'
-core_version_requirement: ^9 || ^10
+core_version_requirement: ^9 || ^10 || ^11
 package: 'GLI'
 configure: gli_auth0.settings
+dependencies:
+  - masquerade:masquerade
+
