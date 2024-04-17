@@ -1,0 +1,5 @@
+gli_auth0.configure:
+  route_name: gli_auth0.settings
+  title: 'Auth0 Settings'
+  description: 'Auth0 Configuration Settings'
+  parent: user.admin_index

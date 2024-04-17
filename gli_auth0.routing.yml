@@ -1,0 +1,59 @@
+gli_auth0.legacy_login:
+  path: '/user/login/legacy'
+  defaults:
+    _form: '\Drupal\user\Form\UserLoginForm'
+    _title: 'Log in'
+  requirements:
+    _access: 'TRUE'
+  options:
+    _maintenance_access: TRUE
+
+gli_auth0.authorize:
+  path: '/user/login'
+  defaults:
+    _controller: '\Drupal\gli_auth0\Controller\Auth0Controller::login'
+  requirements:
+    _access: 'TRUE'
+  options:
+    _maintenance_access: TRUE
+
+gli_auth0.signup:
+  path: '/user/register'
+  defaults:
+    _controller: '\Drupal\gli_auth0\Controller\Auth0Controller::register'
+  requirements:
+    access: 'TRUE'
+
+gli_auth0.callback:
+  path: '/auth0/callback'
+  defaults:
+    _controller: '\Drupal\gli_auth0\Controller\Auth0Controller::callback'
+  requirements:
+    _access: 'TRUE'
+  options:
+    _maintenance_access: TRUE
+
+gli_auth0.logout:
+  path: '/user/logout'
+  defaults:
+    _controller: '\Drupal\gli_auth0\Controller\Auth0Controller::logout'
+  requirements:
+    _access: 'TRUE'
+  options:
+    _maintenance_access: TRUE
+
+gli_auth0.settings:
+  path: '/admin/config/people/auth0settings'
+  defaults:
+    _form: '\Drupal\gli_auth0\Form\Auth0Settings'
+    _title: 'Auth0 Settings'
+  requirements:
+    _permission: 'administer auth0 settings'
+
+gli_auth0.unmask:
+  path: '/unmask'
+  defaults:
+    _controller: '\Drupal\masquerade\Controller\SwitchController::switchBack'
+    _title: 'Unmask'
+  requirements:
+    _user_is_masquerading: 'TRUE'

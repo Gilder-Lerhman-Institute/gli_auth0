@@ -1,0 +1,14 @@
+auth0:
+  domain: ~
+  customDomain: ~
+  clientId: ~
+  clientSecret: ~
+  cookieSecret: ~
+  cookieExpires: ~
+  audience: ~
+  organization: ~
+manager:
+  domain: ~
+  clientId: ~
+  clientSecret: ~
+roles: {}

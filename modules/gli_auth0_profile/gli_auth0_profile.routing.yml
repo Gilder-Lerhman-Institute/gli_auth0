@@ -1,0 +1,14 @@
+gli_auth0_profile.complete_registration:
+  path: '/auth0/registration'
+  defaults:
+    _controller: '\Drupal\gli_auth0_profile\Controller\ProfileController::registration'
+    _title: 'Complete Registration'
+  requirements:
+    _access: 'TRUE'
+
+gli_auth0_profile.registration_done:
+  path: '/auth0/registration-complete'
+  defaults:
+    _controller: '\Drupal\gli_auth0_profile\Controller\ProfileController::registrationComplete'
+  requirements:
+    _user_is_logged_in: 'TRUE'

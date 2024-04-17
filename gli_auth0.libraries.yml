@@ -1,0 +1,7 @@
+registration:
+  css:
+    theme:
+      css/registration.css: {}
+  js:
+    https://service.force.com/embeddedservice/5.0/esw.min.js: { attributes: { async: true }, type: external, minified: true }
+    js/registration.js: {}

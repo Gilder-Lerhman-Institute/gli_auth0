@@ -1,0 +1,9 @@
+gli_auth0_webhook.webhook:
+  path: '/auth0/webhook'
+  defaults:
+    _controller: '\Drupal\gli_auth0_webhook\Controller\WebhookController::webhook'
+  methods: [POST]
+  requirements:
+    _custom_access: '\Drupal\gli_auth0_webhook\Controller\WebhookController::webhookAccess'
+  options:
+    _maintenance_access: TRUE

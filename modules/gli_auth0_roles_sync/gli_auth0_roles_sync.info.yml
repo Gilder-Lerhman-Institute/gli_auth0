@@ -1,0 +1,7 @@
+name: "GLI Auth0 Role Sync"
+type: module
+core_version_requirement: ^9 || ^10
+
+dependencies:
+  - gli_auth0:gli_auth0
+  - gli_auth0:gli_auth0_webhook

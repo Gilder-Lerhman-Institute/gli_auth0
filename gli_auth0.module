@@ -1,0 +1,70 @@
+<?php
+
+/**
+ * @file
+ * Hooks for the gli_auth0 module.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Implements hook_form_alter().
+ *
+ * @todo Convert this to an event subscriber.
+ */
+function gli_auth0_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $endpoints = \Drupal::config('gli_auth0.settings');
+
+  if (
+    isset($endpoints->get('form_zapier_endpoints')[$form_id]) &&
+    ($formEndpoint = $endpoints->get('form_zapier_endpoints')[$form_id]) !== NULL
+  ) {
+    $zapierEndpoint = $endpoints->get('zapier_endpoints')[$formEndpoint];
+    $form_state->getStorage()['gli_auth0_zapier_endpoint'] = $zapierEndpoint;
+    $form['#submit'][] = 'gli_auth0_zapier_ping';
+  }
+}
+
+/**
+ * Callback to run on submission.
+ */
+function gli_auth0_zapier_ping(&$form, FormStateInterface $formState) {
+  // Work around for the book breaks and only working for specific items.
+  if ($formState->getFormObject()->getFormId() === 'gli_book_breaks_form') {
+    if (
+      empty($formState->getValue('flag')) ||
+      // If any other role but the defined here.
+      !in_array($formState->getValue('flag'), ['bb_coll_subscribe', 'bb_aff_subscribe', 'professor_not_subscriber'])
+    ) {
+      return;
+    }
+  }
+  $endpoint = $formState->getStorage()['gli_auth0_zapier_endpoint'] ?? '';
+
+  if (!empty($endpoint)) {
+    $currentUser = \Drupal::service('current_user');
+    $auth0Service = \Drupal::service('gli_auth0');
+    $auth0Id = $auth0Service->getUserAuth0Id($currentUser->id());
+
+    $salesforce_id = $auth0Service->getSalesforceId($auth0Id);
+    if (!empty($salesforce_id)) {
+      \Drupal::service('gli_auth0_zapier')
+        ->ping($endpoint, [
+          'salesforce_id' => $salesforce_id,
+          'auth0_id' => $auth0Id,
+        ]);
+    }
+  }
+}
+
+/**
+ * Implements hook_entity_load().
+ */
+function gli_auth0_entity_load(array $entities, $entity_type_id) {
+  if ($entity_type_id == 'user') {
+    $auth0Service = \Drupal::service('gli_auth0');
+    foreach ($entities AS &$entity) {
+      $entity->auth0_id = $auth0Service->getUserAuth0Id($entity->id());
+    }
+  }
+}

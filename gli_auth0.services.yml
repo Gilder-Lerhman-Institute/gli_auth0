@@ -1,0 +1,20 @@
+services:
+  gli_auth0:
+    class: Drupal\gli_auth0\Service\Auth0Service
+    arguments:
+      - '@config.factory'
+      - '@database'
+      - '@entity_type.manager'
+      - '@user.data'
+      - '@language_manager'
+  gli_auth0_zapier:
+    class: Drupal\gli_auth0\Service\ZapierPing
+    arguments:
+      - '@logger.factory'
+  gli_auth0.auth_subscriber:
+    class: Drupal\gli_auth0\EventSubscriber\AuthenticationSubscriber
+    arguments:
+      - '@gli_auth0'
+      - '@module_handler'
+    tags:
+      - { name: event_subscriber, priority: 1000 }

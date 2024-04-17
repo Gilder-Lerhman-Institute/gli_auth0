@@ -1,0 +1,6 @@
+services:
+  gli_auth0_lazy_migration.migrate_user:
+    class: \Drupal\gli_auth0_lazy_migration\Commands\MigrateUsersCommand
+    arguments: ['@database']
+    tags:
+      - { name: drush.command }

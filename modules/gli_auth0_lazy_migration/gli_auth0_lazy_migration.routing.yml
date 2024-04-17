@@ -1,0 +1,19 @@
+gli_auth0_lazy_migration.migration.login:
+  path: '/auth0/migrate/login'
+  methods: [POST]
+  defaults:
+    _controller: '\Drupal\gli_auth0_lazy_migration\Controller\LoginController::migrationLogin'
+  requirements:
+    _custom_access: '\Drupal\gli_auth0_lazy_migration\Controller\LoginController::migrationAccess'
+  options:
+    _maintenance_access: TRUE
+
+gli_auth0_lazy_migration.migration.get_user:
+  path: '/auth0/migrate/get-user'
+  methods: [POST]
+  defaults:
+    _controller: '\Drupal\gli_auth0_lazy_migration\Controller\LoginController::migrationGetUser'
+  requirements:
+    _custom_access: '\Drupal\gli_auth0_lazy_migration\Controller\LoginController::migrationAccess'
+  options:
+    _maintenance_access: TRUE

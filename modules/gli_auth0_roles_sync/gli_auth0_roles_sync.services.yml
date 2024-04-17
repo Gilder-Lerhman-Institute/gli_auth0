@@ -1,0 +1,7 @@
+services:
+  events_auth0_update_roles:
+    class: Drupal\gli_auth0_roles_sync\EventSubscriber\UpdateUserRoles
+    arguments:
+      - '@gli_auth0'
+    tags:
+      - {name: event_subscriber}

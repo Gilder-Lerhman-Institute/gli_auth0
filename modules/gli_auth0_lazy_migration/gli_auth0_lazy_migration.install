@@ -1,0 +1,42 @@
+<?php
+
+/**
+ * @file
+ * Install hooks for the gli_auth0_lazt_migration module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function gli_auth0_lazy_migration_schema() {
+  $tables = [];
+
+  $tables['gli_auth0_records'] = [
+    'description' => 'Stores the records for Auth0 migration',
+    'fields' => [
+      'mail' => [
+        'type' => 'varchar',
+        'not null' => TRUE,
+        'length' => 255,
+        'description' => 'Primary Key: The user account email',
+      ],
+      'pass' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'description' => 'User account password',
+      ],
+      'salesforce_id' => [
+        'type' => 'varchar',
+        'length' => 18,
+        'description' => 'Salesforce User Account ID',
+      ],
+      'data' => [
+        'type' => 'text',
+        'description' => 'Contains the information for the user account',
+      ],
+    ],
+    'primary_key' => ['mail'],
+  ];
+
+  return $tables;
+}

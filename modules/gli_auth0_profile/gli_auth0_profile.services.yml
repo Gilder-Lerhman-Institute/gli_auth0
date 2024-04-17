@@ -1,0 +1,15 @@
+services:
+  gli_auth0_profile_completed_profile_subscriber:
+    class: Drupal\gli_auth0_profile\EventSubscriber\ProfileCompletedEventSubscriber
+    arguments:
+      - '@current_user'
+      - '@gli_auth0'
+      - '@request_stack'
+      - '@messenger'
+      - '@?masquerade'
+    tags:
+      - { name: event_subscriber }
+  gli_auth0_profile.route_subscriber:
+    class: Drupal\gli_auth0_profile\Routing\RouteSubscriber
+    tags:
+      - { name: event_subscriber }

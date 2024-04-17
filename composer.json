@@ -1,0 +1,8 @@
+{
+    "name": "drupal/gli_auth0",
+    "description": "GLI Auth0 Integration",
+    "type": "drupal-module",
+    "require": {
+        "auth0/auth0-php": "^8.2"
+    }
+}

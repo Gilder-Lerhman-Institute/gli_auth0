@@ -1,0 +1,8 @@
+name: 'GLI Auth0 Integration - Lazy Migration'
+type: module
+description: 'GLI Auth0 Integration'
+core_version_requirement: ^9 || ^10
+package: 'GLI'
+
+dependencies:
+  - gli_auth0:gli_auth0

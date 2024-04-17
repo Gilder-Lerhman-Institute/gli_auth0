@@ -1,0 +1,22 @@
+<?php
+
+/**
+ * @file
+ * Hooks for the gli_auth0_roles_sync module.
+ */
+
+use Drupal\user\UserInterface;
+
+/**
+ * Implements hook_user_login().
+ */
+function gli_auth0_roles_sync_user_login(UserInterface $account) {
+  /** @var \Drupal\gli_auth0\Service\Auth0Service $auth0 */
+  $auth0 = \Drupal::service('gli_auth0');
+
+  $auth0Id = $auth0->getUserAuth0Id($account->id());
+  if ($auth0Id !== NULL) {
+    $auth0->updateUserRoles($auth0Id);
+  }
+
+}

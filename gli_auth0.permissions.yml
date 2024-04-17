@@ -1,0 +1,7 @@
+administer auth0 settings:
+  title: "Administer Auth0 Settings"
+  description: "Administer settings related to Auth0 Service."
+  restrict access: true
+change auth0 user password:
+  title: "Change user's Password"
+  restrict access: true

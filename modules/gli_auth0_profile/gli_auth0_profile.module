@@ -1,0 +1,194 @@
+<?php
+
+/**
+ * @file
+ * Hooks for the gli_auth0_profile module.
+ */
+
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
+use Drupal\gli_auth0_profile\Plugin\Validation\Constraint\Auth0ProtectedUserFieldConstraint;
+
+/**
+ * Implements hook_FORM_alter().
+ */
+function gli_auth0_profile_form_user_form_alter(array &$form, FormStateInterface $formState) {
+  /** @var \Drupal\user\ProfileForm $profile */
+  $profile = $formState->getBuildInfo()['callback_object'];
+  /** @var \Drupal\user\Entity\User $user */
+  $user = $profile->getEntity();
+
+  /** @var \Drupal\gli_auth0\Service\Auth0Service $auth0Service */
+  $auth0Service = \Drupal::service('gli_auth0');
+
+  $auth0Id = $auth0Service->getUserAuth0Id($user->id());
+
+  if ($auth0Id !== NULL) {
+
+    $form['profile_page'] = [
+      '#type' => 'inline_template',
+      '#template' => '
+        <div style="margin-top: 1rem;">
+            <a href="{{ profile_edit }}" style="font-size: 1.25rem; color: red; text-decoration: underline;">{{ "Update Profile Information" | t }}</a>
+        </div>
+      ',
+      '#context' => [
+        'profile_edit' => Url::fromRoute(
+          'gli_auth0_profile.profile_update',
+          [
+            'user' => $user->id(),
+          ],
+          [
+            'https' => TRUE,
+            'absolute' => TRUE,
+          ]
+        )->toString(),
+      ],
+      '#weight' => -9,
+      '#access' => FALSE,
+    ];
+
+    $form['account']['description_email'] = [
+      '#type' => 'markup',
+      '#weight' => -101,
+      '#markup' => '<h2>' . t('Update Login Email') . '</h2>
+        <p>' . t('The following email is used for authentication within the services provided by Gilder Lehrman.') . '</p>',
+    ];
+    $form['account']['auth0_email'] = $form['account']['mail'];
+    $form['account']['auth0_email']['#weight'] = -100;
+    $form['account']['auth0_email']['#description'] = '';
+
+    $form['account']['description_password'] = [
+      '#type' => 'markup',
+      '#weight' => -99,
+      '#markup' => '<h2>' . t('Update Password') . '</h2>
+        <p>' . t("Update the account's password used within the services provided by Gilder Lehrman.") . '</p>',
+    ];
+
+    $form['account']['auth0_pass'] = $form['account']['pass'];
+    $form['account']['auth0_pass']['#weight'] = -98;
+    $form['account']['auth0_pass']['#description'] = '';
+    $form['account']['name']['#access'] = FALSE;
+    $form['account']['mail']['#access'] = FALSE;
+    $form['account']['current_pass']['#access'] = FALSE;
+    $form['account']['auth0_id'] = [
+      '#type' => 'value',
+      '#value' => $auth0Id,
+    ];
+    array_unshift(
+      $form['#validate'],
+      'gli_auth0_profile_password_update',
+      'gli_auth0_profile_email_update'
+    );
+    $form['account']['pass']['#access'] = FALSE;
+  }
+}
+
+/**
+ * Update User's Email.
+ */
+function gli_auth0_profile_email_update(array $form, FormStateInterface $formState) {
+  // Get the current email address.
+  $currentEmail = $formState->getValue('mail');
+  // Get the Auth0 Updated Email address.
+  $newEmail = $formState->getValue('auth0_email');
+
+  // Gather the User's Auth0 ID.
+  $auth0Id = $formState->getValue('auth0_id');
+
+  // If the emails are the same return out of function.
+  if (trim(strtolower($currentEmail)) === trim(strtolower($newEmail))) {
+    return;
+  }
+
+  try {
+    // Confirm if another user exists with email.
+    $users = \Drupal::entityTypeManager()->getStorage('user')->loadByProperties([
+      'mail' => $newEmail,
+    ]);
+
+    if (count($users) > 0) {
+      throw new \Exception('Cannot update user email. Email already in use.');
+    }
+
+    // Update Auth0 User Email.
+    \Drupal::service('gli_auth0')->updateUserEmail($auth0Id, $newEmail);
+
+    // Update user's email address for Drupal Account.
+    $formState->setValue('mail', $newEmail);
+    $formState->setValue('name', $newEmail);
+
+  }
+  catch (\Throwable $exception) {
+    $formState->setErrorByName('', $exception->getMessage());
+    \Drupal::messenger()->addError('Error updating user email. Contact support at support@gilderlehrman.org to assist with updating your email.');
+  }
+}
+
+/**
+ * Update User's Password.
+ */
+function gli_auth0_profile_password_update(array $form, FormStateInterface $formState) {
+  $password = $formState->getValue('auth0_pass');
+  if ($password !== '') {
+    $auth0Id = $formState->getValue('auth0_id');
+    try {
+      \Drupal::service('gli_auth0')->updateUserPassword($auth0Id, $password);
+    }
+    catch (\Throwable $exception) {
+      $formState->setErrorByName('auth0_pass', $exception->getMessage());
+    }
+  }
+}
+
+/**
+ * Implements hook_auth0_callback_url_alter().
+ */
+function gli_auth0_profile_auth0_callback_url_alter(Url &$url, array $data = []) {
+  if (!isset($data['data']['auth0User'])) {
+    return;
+  }
+  $auth0User = $data['data']['auth0User'];
+  $registration_complete = isset($auth0User['app_metadata']['registration_complete']);
+
+  if ($registration_complete) {
+    return;
+  }
+
+  $url = gli_auth0_profile_get_registration_url(
+    $url->toString()
+  );
+}
+
+/**
+ * Return the Registration Url with Params.
+ */
+function gli_auth0_profile_get_registration_url(string $url) {
+  return Url::fromRoute('gli_auth0_profile.complete_registration',
+    [],
+    [
+      'query' => [
+        'redirect_after' => $url,
+      ],
+      'https' => TRUE,
+    ]);
+}
+
+/**
+ * Implements hook_validation_constraint_alter().
+ */
+function gli_auth0_profile_validation_constraint_alter(array &$definitions) {
+  if (isset($definitions['ProtectedUserField'])) {
+    $definitions['ProtectedUserField']['class'] = Auth0ProtectedUserFieldConstraint::class;
+  }
+}
+
+/**
+ * Implements hook_menu_local_tasks_alter().
+ */
+function gli_auth0_profile_menu_local_tasks_alter(&$data, $route_name, RefinableCacheableDependencyInterface &$cacheability) {
+  if ($route_name === 'entity.user.edit_form') {
+    unset($data['tabs'][0]);
+  }
+}
