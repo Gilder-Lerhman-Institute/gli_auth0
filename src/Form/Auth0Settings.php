@@ -139,6 +139,13 @@ final class Auth0Settings extends ConfigFormBase {
       '#default_value' => $config->get('manager')['clientSecret'] ?? '',
     ];
 
+    $form['manager']['cookieSecret'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Cookie Secret'),
+      '#description' => $this->t('Manager cookie secret.'),
+      '#default_value' => $config->get('manager')['cookieSecret'] ?? '',
+    ];
+
     $form['roles'] = [
       '#type' => 'details',
       '#title' => $this->t('Role Mapping'),
