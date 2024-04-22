@@ -1,0 +1,77 @@
+gli_auth0.settings:
+  type: config_object
+  label: 'GLI Auth0 settings'
+  mapping:
+    auth0:
+      label: 'Auth0 settings'
+      type: mapping
+      mapping:
+        domain:
+          label: 'Domain'
+          type: string
+        clientId:
+          label: 'Client ID'
+          type: string
+        clientSecret:
+          label: 'Client secret'
+          type: string
+        cookieSecret:
+          label: 'Cookie secret'
+          type: string
+        cookieExpires:
+          label: 'Cookie expires'
+          type: integer
+    manager:
+      label: 'Manager settings'
+      type: mapping
+      mapping:
+        domain:
+          label: 'Domain'
+          type: string
+        clientId:
+          label: 'Client ID'
+          type: string
+        clientSecret:
+          label: 'Client secret'
+          type: string
+        cookieSecret:
+          label: 'Cookie secret'
+          type: string
+    profile:
+      label: 'Profile settings'
+      type: mapping
+      mapping:
+        url:
+          label: 'URL'
+          type: uri
+        flow:
+          label: 'Flow'
+          type: mapping
+          mapping:
+            registration:
+              label: 'Registration'
+              type: mapping
+              mapping:
+                app_name:
+                  label: 'App name'
+                  type: string
+                component_name:
+                  label: 'Component name'
+                  type: string
+          profile:
+            label: 'Profile'
+            type: mapping
+            mapping:
+              app_name:
+                label: 'App name'
+                type: string
+              component_name:
+                label: 'Component name'
+                type: string
+    roles:
+      label: 'Roles'
+      type: sequence
+      orderby: key
+      sequence:
+        label: 'Role'
+        type: string
