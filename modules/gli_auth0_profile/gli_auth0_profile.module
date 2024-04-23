@@ -14,50 +14,55 @@ use Drupal\gli_auth0_profile\Plugin\Validation\Constraint\Auth0ProtectedUserFiel
  * Implements hook_FORM_alter().
  */
 function gli_auth0_profile_form_user_form_alter(array &$form, FormStateInterface $formState) {
-  /** @var \Drupal\user\ProfileForm $profile */
-  $profile = $formState->getBuildInfo()['callback_object'];
-  /** @var \Drupal\user\Entity\User $user */
-  $user = $profile->getEntity();
+  $build_info = $formState->getBuildInfo();
 
-  /** @var \Drupal\gli_auth0\Service\Auth0Service $auth0Service */
-  $auth0Service = \Drupal::service('gli_auth0');
+  // This hook is called for 'user_form' and 'user_register_form', but in the
+  // later case the user is unknown.
+  if ($build_info['form_id'] == 'user_form') {
+    /** @var \Drupal\user\ProfileForm $profile */
+    $profile = $build_info['callback_object'];
+    /** @var \Drupal\user\Entity\User $user */
+    $user = $profile->getEntity();
+    /** @var \Drupal\gli_auth0\Service\Auth0Service $auth0Service */
+    $auth0Service = \Drupal::service('gli_auth0');
 
-  $auth0Id = $auth0Service->getUserAuth0Id($user->id());
+    $auth0Id = $auth0Service->getUserAuth0Id($user->id());
 
-  if ($auth0Id !== NULL) {
-    $form['account']['description_email'] = [
-      '#type' => 'markup',
-      '#weight' => -101,
-      '#markup' => '<h2>' . t('Update Login Email') . '</h2>
-        <p>' . t('The following email is used for authentication within the services provided by Gilder Lehrman.') . '</p>',
-    ];
-    $form['account']['auth0_email'] = $form['account']['mail'];
-    $form['account']['auth0_email']['#weight'] = -100;
-    $form['account']['auth0_email']['#description'] = '';
+    if ($auth0Id !== NULL) {
+      $form['account']['description_email'] = [
+        '#type' => 'markup',
+        '#weight' => -101,
+        '#markup' => '<h2>' . t('Update Login Email') . '</h2>
+          <p>' . t('The following email is used for authentication within the services provided by Gilder Lehrman.') . '</p>',
+      ];
+      $form['account']['auth0_email'] = $form['account']['mail'];
+      $form['account']['auth0_email']['#weight'] = -100;
+      $form['account']['auth0_email']['#description'] = '';
 
-    $form['account']['description_password'] = [
-      '#type' => 'markup',
-      '#weight' => -99,
-      '#markup' => '<h2>' . t('Update Password') . '</h2>
-        <p>' . t("Update the account's password used within the services provided by Gilder Lehrman.") . '</p>',
-    ];
+      $form['account']['description_password'] = [
+        '#type' => 'markup',
+        '#weight' => -99,
+        '#markup' => '<h2>' . t('Update Password') . '</h2>
+          <p>' . t("Update the account's password used within the services provided by Gilder Lehrman.") . '</p>',
+      ];
 
-    $form['account']['auth0_pass'] = $form['account']['pass'];
-    $form['account']['auth0_pass']['#weight'] = -98;
-    $form['account']['auth0_pass']['#description'] = '';
-    $form['account']['name']['#access'] = FALSE;
-    $form['account']['mail']['#access'] = FALSE;
-    $form['account']['current_pass']['#access'] = FALSE;
-    $form['account']['auth0_id'] = [
-      '#type' => 'value',
-      '#value' => $auth0Id,
-    ];
-    array_unshift(
-      $form['#validate'],
-      'gli_auth0_profile_password_update',
-      'gli_auth0_profile_email_update'
-    );
-    $form['account']['pass']['#access'] = FALSE;
+      $form['account']['auth0_pass'] = $form['account']['pass'];
+      $form['account']['auth0_pass']['#weight'] = -98;
+      $form['account']['auth0_pass']['#description'] = '';
+      $form['account']['name']['#access'] = FALSE;
+      $form['account']['mail']['#access'] = FALSE;
+      $form['account']['current_pass']['#access'] = FALSE;
+      $form['account']['auth0_id'] = [
+        '#type' => 'value',
+        '#value' => $auth0Id,
+      ];
+      array_unshift(
+        $form['#validate'],
+        'gli_auth0_profile_password_update',
+        'gli_auth0_profile_email_update'
+      );
+      $form['account']['pass']['#access'] = FALSE;
+    }
   }
 }
 

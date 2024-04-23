@@ -38,7 +38,7 @@ class Auth0ProtectedUserFieldConstraintValidator extends ProtectedUserFieldConst
 
     /** @var \Drupal\user\UserInterface|NULL $account */
     $account = $items->getEntity();
-    if (!isset($account) || !empty($account->_skipProtectedUserFieldConstraint)) {
+    if (empty($account) || empty($account->id()) || !empty($account->_skipProtectedUserFieldConstraint)) {
       // Looks like we are validating a field not being part of a user, or the
       // constraint should be skipped, so do nothing.
       return;
