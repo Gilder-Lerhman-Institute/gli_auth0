@@ -173,3 +173,32 @@ function gli_auth0_profile_menu_local_tasks_alter(&$data, $route_name, Refinable
     unset($data['tabs'][0]);
   }
 }
+
+/**
+ * Implements hook_theme().
+ */
+function gli_auth0_profile_theme($existing, $type, $theme, $path) {
+  return [
+    'gli_auth0_profile_registration' => [
+      'template' => 'registration',
+    ],
+  ];
+}
+
+/**
+ * Implements template_preprocess_gli_auth0_profile_registration().
+ */
+function template_preprocess_gli_auth0_profile_registration(&$variables) {
+  $data = \Drupal::config('gli_auth0');
+  $currentUser = \Drupal::currentUser();
+  $auth0Service = \Drupal::service('gli_auth0');
+
+  $auth0UserId = $auth0Service->getUserAuth0Id($currentUser->id());
+  $variables['#attached']['drupalSettings'] = ['gli_auth0_profile_registration' => [
+    'app_name' => $data->get('profile')['url'],
+    'component_name' => $data->get('profile')['url'],
+    'experience_cloud' => $data->get('profile')['url'],
+    'form_data' => $formData,
+    'redirect_url' => \Drupal::requestStack()->getCurrentRequest()->query->get('redirect_after', '/'),
+  ]];
+}

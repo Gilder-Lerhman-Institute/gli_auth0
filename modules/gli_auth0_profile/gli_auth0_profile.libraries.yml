@@ -1,0 +1,9 @@
+registration:
+  css:
+    theme:
+      css/registration.css: {}
+  js:
+    'https://embeddedflow-developer-edition.ap24.force.com/lightning/lightning.out.js': {external: true}
+    js/registration: {}
+  dependencies:
+    - core/drupalSettings

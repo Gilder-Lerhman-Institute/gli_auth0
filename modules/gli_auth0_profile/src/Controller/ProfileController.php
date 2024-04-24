@@ -91,69 +91,8 @@ final class ProfileController extends ControllerBase {
       return $this->redirect('<front>');
     }
 
-    $auth0UserId = $this->auth0Service->getUserAuth0Id($this->currentUser()->id());
-
     return [
-      '#type' => 'inline_template',
-      '#template' => '
-        <div id="registration-form">
-          <style>
-          .slds-scope .slds-select_container .slds-select {
-              height: auto;
-              padding-top: 0.5rem;
-              padding-bottom: 0.5rem;
-          }
-          </style>
-          <div id="container"></div>
-          <script type="text/javascript" src="https://embeddedflow-developer-edition.ap24.force.com/lightning/lightning.out.js"></script>
-          <script type="text/javascript">
-            const init = function(){
-                $Lightning.use("c:{{ app_name }}",
-                    function() {
-                        $Lightning.createComponent(
-                            "c:{{ component_name }}",
-                            { "Auth0ID": "{{ auth0_id }}", "EmailAddress": "{{ auth0_email }}", "DrupalID": "{{ auth0_drupal_id }}", "WebsiteSource": "{{ auth0_website }}" },
-                            "container",
-                            function(cmp) {}
-                        );
-                    },
-                    "{{ experience_cloud }}"  // Experience Cloud site endpoint
-                );
-            };
-            setTimeout(init, 100);
-
-            // Check to see if OK then redirect.
-            function setRedirect() {
-              // Go to the endpoint and if the response is ok then redirect to the provided destination.
-              setTimeout(function() {
-                fetch("/auth0/registration-complete")
-                  .then((response) => response.text())
-                  .then(function(text) {
-                    if (text === "ok") {
-                      window.location = "{{ auth0_destination_url }}";
-                    } else {
-                      setRedirect();
-                    }
-                  })
-              }, 2000);
-            }
-
-            // Once the registration is complete redirect.
-            document.addEventListener("registration_complete", event => {
-              setRedirect();
-            });
-          </script>
-		    </div>',
-      '#context' => [
-        'experience_cloud' => $this->config('gli_auth0.settings')->get('profile')['url'],
-        'app_name' => $this->config('gli_auth0.settings')->get('profile')['flow']['registration']['app_name'],
-        'component_name' => $this->config('gli_auth0.settings')->get('profile')['flow']['registration']['component_name'],
-        'auth0_id' => $auth0UserId,
-        'auth0_email' => $this->currentUser()->getEmail(),
-        'auth0_drupal_id' => $this->currentUser()->id(),
-        'auth0_destination_url' => $this->requestStack->getCurrentRequest()->query->get('redirect_after', '/'),
-        'auth0_website' => $this->requestStack->getCurrentRequest()->getHttpHost(),
-      ],
+      '#theme' => 'gli_auth0_profile_registration'
     ];
   }
 
