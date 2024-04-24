@@ -189,9 +189,11 @@ function gli_auth0_profile_theme($existing, $type, $theme, $path) {
  * Implements template_preprocess_gli_auth0_profile_registration().
  */
 function template_preprocess_gli_auth0_profile_registration(&$variables) {
-  $data = \Drupal::config('gli_auth0');
+  $data = \Drupal::config('gli_auth0.settings');
   $currentUser = \Drupal::currentUser();
   $auth0Service = \Drupal::service('gli_auth0');
+
+  $auth0UserId = $auth0Service->getUserAuth0Id($currentUser->id());
 
   $formData = [
     'Auth0ID' => $auth0UserId,
@@ -202,7 +204,6 @@ function template_preprocess_gli_auth0_profile_registration(&$variables) {
 
   \Drupal::moduleHandler()->alter(['gli_auth0_form_data', 'gli_auth0_form_data_registration'], $formData); 
 
-  $auth0UserId = $auth0Service->getUserAuth0Id($currentUser->id());
   $variables['#attached']['drupalSettings'] = ['gli_auth0_profile_registration' => [
     'app_name' => $data->get('profile')['url'],
     'component_name' => $data->get('profile')['url'],
