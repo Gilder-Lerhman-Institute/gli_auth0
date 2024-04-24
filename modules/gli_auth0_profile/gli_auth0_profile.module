@@ -193,6 +193,15 @@ function template_preprocess_gli_auth0_profile_registration(&$variables) {
   $currentUser = \Drupal::currentUser();
   $auth0Service = \Drupal::service('gli_auth0');
 
+  $formData = [
+    'Auth0ID' => $auth0UserId,
+    'EmailAddress' => $currentUser->getEmail(),
+    'DrupalID' => $currentUser->id(),
+    'WebsiteSource' => \Drupal::config('system.site')->get('name'),
+  ];
+
+  \Drupal::moduleHandler()->alter(['gli_auth0_form_data', 'gli_auth0_form_data_registration'], $formData); 
+
   $auth0UserId = $auth0Service->getUserAuth0Id($currentUser->id());
   $variables['#attached']['drupalSettings'] = ['gli_auth0_profile_registration' => [
     'app_name' => $data->get('profile')['url'],
