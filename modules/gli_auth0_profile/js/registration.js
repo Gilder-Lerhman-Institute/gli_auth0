@@ -16,14 +16,14 @@
         });
     }, 2000);
   };
-  
+
   Drupal.behaviors.completeListener = {
     attach: function () {
       const init = function(){
-        $Lightning.use("c:" + drupalSettings.gli_auth0_profile_registration.app_name,
+        $Lightning.use(drupalSettings.gli_auth0_profile_registration.app_name,
           function() {
             $Lightning.createComponent(
-              "c:" + drupalSettings.gli_auth0_profile_registration.component_name,
+              drupalSettings.gli_auth0_profile_registration.component_name,
               drupalSettings.gli_auth0_profile_registration.form_data,
               "container",
               function(cmp) {}

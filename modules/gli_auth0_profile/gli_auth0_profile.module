@@ -205,8 +205,8 @@ function template_preprocess_gli_auth0_profile_registration(&$variables) {
   \Drupal::moduleHandler()->alter(['gli_auth0_form_data', 'gli_auth0_form_data_registration'], $formData); 
 
   $variables['#attached']['drupalSettings'] = ['gli_auth0_profile_registration' => [
-    'app_name' => $data->get('profile')['flow']['registration']['app_name'],
-    'component_name' => $data->get('profile')['flow']['registration']['component_name'],
+    'app_name' => 'c:' . $data->get('profile')['flow']['registration']['app_name'],
+    'component_name' => 'c:' . $data->get('profile')['flow']['registration']['component_name'],
     'experience_cloud' => $data->get('profile')['url'],
     'form_data' => $formData,
     'redirect_url' => \Drupal::requestStack()->getCurrentRequest()->query->get('redirect_after', '/'),
