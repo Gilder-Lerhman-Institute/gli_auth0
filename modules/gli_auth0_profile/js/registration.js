@@ -3,16 +3,16 @@
   Drupal.behaviors.completeListener = {
     attach: function () {
       const init = function(){
-        $Lightning.use("c:" + drupalSettings.gli_auth0_profile.app_name,
+        $Lightning.use("c:" + drupalSettings.gli_auth0_profile_registration.app_name,
           function() {
             $Lightning.createComponent(
-              "c:" + drupalSettings.gli_auth0_profile.component_name,
-              JSON.stringify(drupalSettings.gli_auth0_profile.form_data),
+              "c:" + drupalSettings.gli_auth0_profile_registration.component_name,
+              drupalSettings.gli_auth0_profile_registration.form_data,
               "container",
               function(cmp) {}
             );
           },
-          drupalSettings.gli_auth0_profile.experience_cloud
+          drupalSettings.gli_auth0_profile_registration.experience_cloud
         );
       };
       setTimeout(init, 100);
@@ -34,8 +34,9 @@
       };
 
       document.addEventListener("registration_complete", event => {
-        Drupal.gliAuth0Profile.setRedirect(drupalSettings.gli_auth0_profile.redirect_url ?? '/');
+        Drupal.gliAuth0Profile.setRedirect(drupalSettings.gli_auth0_profile_registration.redirect_url ?? '/');
       });
     }
   };
 })(Drupal, drupalSettings);
+
