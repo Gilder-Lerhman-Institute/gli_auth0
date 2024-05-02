@@ -436,23 +436,31 @@ class Auth0Service {
 
     if (!is_null($user)) {
 
-      $auth0Roles = array_map(function (array $role) {
+      // Get all of users roles.
+      $auth0UserRoles = array_map(function (array $role) {
         return $role['id'];
       }, $this->getUserRoles($id));
-      $roleMapping = $this->roles;
+      // Get all the mapped roles.
+      $roleMapping = array_filter($this->roles);
+      // Get all the drupal roles that are mapped.
+      $mappedDrupalRoles = array_unique(array_values($roleMapping));
 
+      // Keep track if we should save the user.
       $save = FALSE;
-      foreach ($roleMapping as $roleId => $drupalRole) {
-        if (!empty($drupalRole)) {
-          if (in_array($roleId, $auth0Roles) && !$user->hasRole($drupalRole)) {
-            $save = TRUE;
-            $user->addRole($drupalRole);
-          }
-          if (!in_array($roleId, $auth0Roles) && $user->hasRole($drupalRole)) {
-            $save = TRUE;
-            $user->removeRole($drupalRole);
-          }
 
+      // Loop through all currently mapped roles and remove them from the user.
+      foreach ($mappedDrupalRoles as $drupalRole) {
+        if ($user->hasRole($drupalRole)) {
+          $save = TRUE;
+          $user->removeRole($drupalRole);
+        }
+      }
+
+      // Loop through all the Auth0 Roles and apply them to the user.
+      foreach ($auth0UserRoles as $roleId) {
+        if (!empty($drupalRole = $roleMapping[$roleId])) {
+          $save = TRUE;
+          $user->addRole($drupalRole);
         }
       }
 
