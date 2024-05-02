@@ -13,3 +13,9 @@ services:
     class: Drupal\gli_auth0_profile\Routing\RouteSubscriber
     tags:
       - { name: event_subscriber }
+  gli_auth0_profile.role_sync:
+    class: Drupal\gli_auth0_profile\EventSubscriber\RoleSyncSubscriber
+    arguments:
+      - '@gli_auth0'
+    tags:
+      - { name: event_subscriber, priority: 900 }
