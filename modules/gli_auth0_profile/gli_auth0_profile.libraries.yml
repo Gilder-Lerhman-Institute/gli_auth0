@@ -3,7 +3,7 @@ registration:
     theme:
       css/registration.css: {}
   js:
-    'https://embeddedflow-developer-edition.ap24.force.com/lightning/lightning.out.js': {external: true}
+    'https://gilderlehrman.my.site.com/lightning/lightning.out.js': {external: true}
     js/registration.js: {}
   dependencies:
     - core/drupalSettings
