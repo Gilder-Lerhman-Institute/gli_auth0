@@ -62,8 +62,27 @@ final class ProfileController extends ControllerBase {
         throw new \Exception('Registration not complete');
       }
 
+      // Get the current user fromm the user id.
       $currentUser = $this->entityTypeManager()->getStorage('user')->load($this->currentUser()->id());
-      $roles = $this->auth0Service->getUserRoles($auth0Id);
+
+      // How many tries to get the roles.
+      $tries = 5;
+
+      // How many seconds should it wait in between.
+      $sleepTime = 2;
+
+      // Try to get all the records.
+      for ($count = 0; $count < $tries; $count++) {
+        $roles = $this->auth0Service->getUserRoles($auth0Id);
+        if (!empty($roles)) {
+          break;
+        }
+
+        if ($count < ($tries - 1)) { // Prevent sleep on the last iteration
+          sleep($sleepTime);
+        }
+      }
+
       // Dispatch Event.
       $event = new UpdateUserEvent($currentUser, $auth0Id, $fullUser, $roles);
       $this->eventDispatcher->dispatch($event, GLIAuth0Events::AUTH0_USER_UPDATE);
