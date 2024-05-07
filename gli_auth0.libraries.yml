@@ -1,0 +1,4 @@
+lightning:
+  js:
+    'https://gilderlehrman.my.site.com/lightning/lightning.out.js': {external: true}
+

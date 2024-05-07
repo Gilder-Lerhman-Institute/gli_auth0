@@ -3,7 +3,7 @@ registration:
     theme:
       css/registration.css: {}
   js:
-    'https://gilderlehrman.my.site.com/lightning/lightning.out.js': {external: true}
     js/registration.js: {}
   dependencies:
     - core/drupalSettings
+    - gli_auth0/lightning
