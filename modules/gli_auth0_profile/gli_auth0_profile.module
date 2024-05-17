@@ -181,6 +181,7 @@ function gli_auth0_profile_theme($existing, $type, $theme, $path) {
   return [
     'gli_auth0_profile_registration' => [
       'template' => 'registration',
+      'variables' => ['lightning_endpoint' => NULL],
     ],
   ];
 }
@@ -202,8 +203,9 @@ function template_preprocess_gli_auth0_profile_registration(&$variables) {
     'WebsiteSource' => \Drupal::config('system.site')->get('name'),
   ];
 
-  \Drupal::moduleHandler()->alter(['gli_auth0_form_data', 'gli_auth0_form_data_registration'], $formData); 
+  \Drupal::moduleHandler()->alter(['gli_auth0_form_data', 'gli_auth0_form_data_registration'], $formData);
 
+  $variables['lightning_endpoint'] = $data->get('profile')['url'];
   $variables['#attached']['drupalSettings']['gli_auth0_profile_registration'] = [
     'app_name' => 'c:' . $data->get('profile')['flow']['registration']['app_name'],
     'component_name' => 'c:' . $data->get('profile')['flow']['registration']['component_name'],

@@ -111,7 +111,7 @@ final class ProfileController extends ControllerBase {
     }
 
     return [
-      '#theme' => 'gli_auth0_profile_registration'
+      '#theme' => 'gli_auth0_profile_registration',
     ];
   }
 

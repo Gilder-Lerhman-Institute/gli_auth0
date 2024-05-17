@@ -6,4 +6,3 @@ registration:
     js/registration.js: {}
   dependencies:
     - core/drupalSettings
-    - gli_auth0/lightning
