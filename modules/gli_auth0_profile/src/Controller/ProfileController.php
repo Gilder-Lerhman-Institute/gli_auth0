@@ -4,6 +4,7 @@ namespace Drupal\gli_auth0_profile\Controller;
 
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\PageCache\ResponsePolicy\KillSwitch;
 use Drupal\Core\Url;
 use Drupal\gli_auth0\Event\GLIAuth0Events;
 use Drupal\gli_auth0\Event\UpdateUserEvent;
@@ -28,15 +29,20 @@ final class ProfileController extends ControllerBase {
     return new static(
       $container->get('gli_auth0'),
       $container->get('request_stack'),
-      $container->get('event_dispatcher')
+      $container->get('event_dispatcher'),
+      $container->get('page_cache_kill_switch')
     );
   }
 
   /**
    * Constructor.
    */
-  public function __construct(protected Auth0Service $auth0Service, protected RequestStack $requestStack, protected EventDispatcherInterface $eventDispatcher) {
-
+  public function __construct(
+    protected Auth0Service $auth0Service,
+    protected RequestStack $requestStack,
+    protected EventDispatcherInterface $eventDispatcher,
+    protected KillSwitch $killSwitch
+  ) {
   }
 
   /**
@@ -53,6 +59,12 @@ final class ProfileController extends ControllerBase {
    * Confirm if user is registered.
    */
   public function registrationComplete() {
+    $this->killSwitch->trigger();
+    // If anonymous redirect to login.
+    if ($this->currentUser()->isAnonymous()) {
+      return $this->redirect('<front>');
+    }
+
     $response = 'ok';
     try {
       $auth0User = $this->auth0Service->getSdk()->getUser();
