@@ -458,9 +458,9 @@ class Auth0Service {
 
       // Loop through all the Auth0 Roles and apply them to the user.
       foreach ($auth0UserRoles as $roleId) {
-        if (!empty($drupalRole = $roleMapping[$roleId])) {
+        if (!empty($roleMapping[$roleId])) {
           $save = TRUE;
-          $user->addRole($drupalRole);
+          $user->addRole($roleMapping[$roleId]);
         }
       }
 

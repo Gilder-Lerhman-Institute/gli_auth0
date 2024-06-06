@@ -1,5 +1,6 @@
 (function(Drupal, drupalSettings) {
   'use strict';
+  let registrationShown = false;
 
   Drupal.gliAuth0Profile = Drupal.gliAuth0Profile || {};
   Drupal.gliAuth0Profile.setRedirect = function(redirectUrl) {
@@ -32,7 +33,10 @@
           drupalSettings.gli_auth0_profile_registration.experience_cloud
         );
       };
-      setTimeout(init, 100);
+      if (!registrationShown && !document.querySelector('#container').hasChildNodes()) {
+        setTimeout(init, 100);
+        registrationShown = true;
+      }
 
       document.addEventListener("registration_complete", event => {
         Drupal.gliAuth0Profile.setRedirect(drupalSettings.gli_auth0_profile_registration.redirect_url ?? '/');
