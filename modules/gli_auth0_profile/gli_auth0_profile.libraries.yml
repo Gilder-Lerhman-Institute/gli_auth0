@@ -3,6 +3,6 @@ registration:
     theme:
       css/registration.css: {}
   js:
-    js/registration.js: {}
+    js/registration.js: { preprocess: false }
   dependencies:
     - core/drupalSettings
