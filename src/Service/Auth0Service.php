@@ -11,6 +11,7 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\user\UserDataInterface;
 use Drupal\user\UserInterface;
@@ -98,6 +99,8 @@ class Auth0Service {
    *   User Data Storage.
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   Language Manager Service.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
+   *   Module Handler Service.
    *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
@@ -107,7 +110,8 @@ class Auth0Service {
     Connection $database,
     EntityTypeManagerInterface $entityTypeManager,
     UserDataInterface $userData,
-    LanguageManagerInterface $languageManager
+    LanguageManagerInterface $languageManager,
+    ModuleHandlerInterface $moduleHandler
   ) {
     $settings = $configFactory->get('gli_auth0.settings');
     $this->settings = $settings->get('auth0');
@@ -117,6 +121,7 @@ class Auth0Service {
     $this->userStorage = $entityTypeManager->getStorage('user');
     $this->userData = $userData;
     $this->languageManager = $languageManager;
+    $this->moduleHandler = $moduleHandler;
   }
 
   /**
@@ -303,8 +308,14 @@ class Auth0Service {
     $this->userData
       ->set('gli_auth0', $user->id(), 'auth0_id', $id);
 
+
+    $app_metadata = [];
+    $this->moduleHandler->alter('gli_auth0_user_app_metadata', $app_metadata, $user);
+
     // Update the app metadata with the drupal user id.
-    $this->getManager()->management()->users()->update($id, ['app_metadata' => ['drupal_id' => $user->id()]]);
+    if (!empty($app_metadata)) {
+      $this->getManager()->management()->users()->update($id, ['app_metadata' => $app_metadata]);
+    }
 
     return $user;
   }
