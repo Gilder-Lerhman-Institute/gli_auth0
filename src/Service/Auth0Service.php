@@ -59,6 +59,13 @@ class Auth0Service {
   protected ?Auth0 $manager = NULL;
 
   /**
+   * Module handler.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   */
+  protected ModuleHandlerInterface $moduleHandler;
+
+  /**
    * Database Service.
    *
    * @var \Drupal\Core\Database\Connection
