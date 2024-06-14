@@ -185,32 +185,3 @@ function gli_auth0_profile_theme($existing, $type, $theme, $path) {
     ],
   ];
 }
-
-/**
- * Implements template_preprocess_gli_auth0_profile_registration().
- */
-function template_preprocess_gli_auth0_profile_registration(&$variables) {
-  $data = \Drupal::config('gli_auth0.settings');
-  $currentUser = \Drupal::currentUser();
-  $auth0Service = \Drupal::service('gli_auth0');
-
-  $auth0UserId = $auth0Service->getUserAuth0Id($currentUser->id());
-
-  $formData = [
-    'Auth0ID' => $auth0UserId,
-    'EmailAddress' => $currentUser->getEmail(),
-    'DrupalID' => $currentUser->id(),
-    'WebsiteSource' => \Drupal::config('system.site')->get('name'),
-  ];
-
-  \Drupal::moduleHandler()->alter(['gli_auth0_form_data', 'gli_auth0_form_data_registration'], $formData);
-
-  $variables['lightning_endpoint'] = $data->get('profile')['url'];
-  $variables['#attached']['drupalSettings']['gli_auth0_profile_registration'] = [
-    'app_name' => 'c:' . $data->get('profile')['flow']['registration']['app_name'],
-    'component_name' => 'c:' . $data->get('profile')['flow']['registration']['component_name'],
-    'experience_cloud' => $data->get('profile')['url'],
-    'form_data' => $formData,
-    'redirect_url' => \Drupal::requestStack()->getCurrentRequest()->query->get('redirect_after', '/'),
-  ];
-}
