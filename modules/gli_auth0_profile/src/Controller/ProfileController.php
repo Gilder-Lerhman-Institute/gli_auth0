@@ -114,6 +114,7 @@ final class ProfileController extends ControllerBase {
    * Salesforce Flow Registration Endpoint.
    */
   public function registration() {
+    $this->killSwitch->trigger();
     // If anonymous redirect to login.
     if ($this->currentUser()->isAnonymous()) {
       return $this->redirect('gli_auth0.authorize');
