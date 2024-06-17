@@ -5,6 +5,7 @@ namespace Drupal\gli_auth0_profile\Controller;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\PageCache\ResponsePolicy\KillSwitch;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Url;
 use Drupal\gli_auth0\Event\GLIAuth0Events;
 use Drupal\gli_auth0\Event\UpdateUserEvent;
@@ -30,7 +31,8 @@ final class ProfileController extends ControllerBase {
       $container->get('gli_auth0'),
       $container->get('request_stack'),
       $container->get('event_dispatcher'),
-      $container->get('page_cache_kill_switch')
+      $container->get('page_cache_kill_switch'),
+      $container->get('renderer')
     );
   }
 
@@ -41,7 +43,8 @@ final class ProfileController extends ControllerBase {
     protected Auth0Service $auth0Service,
     protected RequestStack $requestStack,
     protected EventDispatcherInterface $eventDispatcher,
-    protected KillSwitch $killSwitch
+    protected KillSwitch $killSwitch,
+    protected RendererInterface $renderer
   ) {
   }
 
@@ -75,6 +78,7 @@ final class ProfileController extends ControllerBase {
       }
 
       // Get the current user fromm the user id.
+      /** @var \Drupal\User\UserInterface $currentUser */
       $currentUser = $this->entityTypeManager()->getStorage('user')->load($this->currentUser()->id());
 
       // How many tries to get the roles.
@@ -110,6 +114,7 @@ final class ProfileController extends ControllerBase {
    * Salesforce Flow Registration Endpoint.
    */
   public function registration() {
+    $this->killSwitch->trigger();
     // If anonymous redirect to login.
     if ($this->currentUser()->isAnonymous()) {
       return $this->redirect('gli_auth0.authorize');
@@ -122,10 +127,44 @@ final class ProfileController extends ControllerBase {
       return $this->redirect('<front>');
     }
 
-    return [
-      '#theme' => 'gli_auth0_profile_registration',
-      '#attached' => ['library' => ['gli_auth0_profile/registration']],
+    $data = $this->config('gli_auth0.settings');
+    $currentUser = $this->currentUser();
+
+    $auth0UserId = $this->auth0Service->getUserAuth0Id($currentUser->id());
+
+    $formData = [
+      'Auth0ID' => $auth0UserId,
+      'EmailAddress' => $currentUser->getEmail(),
+      'DrupalID' => $currentUser->id(),
+      'WebsiteSource' => $this->config('system.site')->get('name'),
     ];
+
+    $this->moduleHandler()->alter(['gli_auth0_form_data', 'gli_auth0_form_data_registration'], $formData);
+
+    $build = [
+      '#theme' => 'gli_auth0_profile_registration',
+      '#attached' => [
+        'library' => ['gli_auth0_profile/registration'],
+        'drupalSettings' => [
+          'gli_auth0_profile_registration' => [
+            'app_name' => 'c:' . $data->get('profile')['flow']['registration']['app_name'],
+            'component_name' => 'c:' . $data->get('profile')['flow']['registration']['component_name'],
+            'experience_cloud' => $data->get('profile')['url'],
+            'form_data' => $formData,
+            'redirect_url' => $this->requestStack->getCurrentRequest()->query->get('redirect_after', '/'),
+          ],
+        ],
+      ],
+      '#cache' => ['tags' => ['user:' . $currentUser->id()]],
+      '#lightning_endpoint' => $data->get('profile')['url'],
+    ];
+
+    $this->renderer->addCacheableDependency(
+      $build,
+      $this->entityTypeManager()->getStorage('user')->load($currentUser->id())
+    );
+
+    return $build;
   }
 
   /**
