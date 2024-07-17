@@ -32,7 +32,7 @@
           drupalSettings.gli_auth0_profile_registration.experience_cloud
         );
       };
-      if (!registrationShown && !document.querySelector('#container').hasChildNodes()) {
+      if (!registrationShown && document.querySelector('#container .cEmbeddedFlow') == null) {
         setTimeout(init, 100);
         registrationShown = true;
       }
