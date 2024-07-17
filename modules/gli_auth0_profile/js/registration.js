@@ -19,6 +19,24 @@
 
   Drupal.behaviors.completeListener = {
     attach: function () {
+      const observer = new MutationObserver((mutationList) => {
+        for (const { addedNodes } of mutationList) {
+          for (const node of addedNodes) {
+            if (!node.tagName) continue; // not an element
+            if (node.classList.contains('cEmbeddedFlow')) {
+              // Remove placeholder content.
+              const placeholderEl = document.querySelector('#container .registration-form-placeholder');
+              if (placeholderEl != null) {
+                placeholderEl.parentNode.removeChild(placeholderEl);
+              }
+            }
+          }
+        }
+      });
+      observer.observe(document.querySelector('#container'), {
+        childList: true
+      });
+
       const init = function () {
         $Lightning.use(drupalSettings.gli_auth0_profile_registration.app_name,
           function () {
