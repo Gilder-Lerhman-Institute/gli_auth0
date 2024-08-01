@@ -22,7 +22,7 @@ gli_auth0.signup:
   defaults:
     _controller: '\Drupal\gli_auth0\Controller\Auth0Controller::register'
   requirements:
-    access: 'TRUE'
+    _user_is_logged_in: 'FALSE'
 
 gli_auth0.callback:
   path: '/auth0/callback'
