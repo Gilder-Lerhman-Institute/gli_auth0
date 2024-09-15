@@ -33,6 +33,13 @@ gli_auth0.callback:
   options:
     _maintenance_access: TRUE
 
+gli_auth0.verify_email:
+  path: '/auth0/verify-email'
+  defaults:
+    _controller: '\Drupal\gli_auth0\Controller\Auth0Controller::verifyEmail'
+  requirements:
+    _user_is_logged_in: 'TRUE'
+
 gli_auth0.logout:
   path: '/user/logout'
   defaults:

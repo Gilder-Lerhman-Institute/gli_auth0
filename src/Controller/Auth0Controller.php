@@ -5,6 +5,7 @@ namespace Drupal\gli_auth0\Controller;
 use Auth0\SDK\Exception\StateException;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\PageCache\ResponsePolicy\KillSwitch;
+use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\Url;
 use Drupal\gli_auth0\Event\AuthenticationEvent;
 use Drupal\gli_auth0\Event\GLIAuth0Events;
@@ -50,6 +51,13 @@ final class Auth0Controller extends ControllerBase {
   protected RequestStack $requestStack;
 
   /**
+   * Drupal\Core\Session\AccountProxy definition.
+   *
+   * @var \Drupal\Core\Session\AccountProxyInterface
+   */
+  protected $currentUser;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
@@ -57,7 +65,8 @@ final class Auth0Controller extends ControllerBase {
       $container->get('gli_auth0'),
       $container->get('page_cache_kill_switch'),
       $container->get('event_dispatcher'),
-      $container->get('request_stack')
+      $container->get('request_stack'),
+      $container->get('current_user')
     );
   }
 
@@ -72,17 +81,21 @@ final class Auth0Controller extends ControllerBase {
    *   Event Dispatcher Service.
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   Request Stack Service.
+   * @param \Drupal\Core\Session\AccountProxyInterface $currentUser
+   *   Drupal\Core\Session\AccountProxy definition.
    */
   public function __construct(
     Auth0Service $auth0Service,
     KillSwitch $killSwitch,
     EventDispatcherInterface $eventDispatcher,
-    RequestStack $requestStack
+    RequestStack $requestStack,
+    AccountProxyInterface $currentUser
   ) {
     $this->auth0Service = $auth0Service;
     $this->killSwitch = $killSwitch;
     $this->eventDispatcher = $eventDispatcher;
     $this->requestStack = $requestStack;
+    $this->currentUser = $currentUser;
   }
 
   /**
@@ -203,6 +216,23 @@ final class Auth0Controller extends ControllerBase {
     $response->setStatusCode(302);
     $response->headers->set('LOCATION', $callback);
     return $response;
+  }
+
+  /**
+   * Create job to send verification email.
+   */
+  public function verifyEmail() {
+    $auth0Id = $this->auth0Service->getUserAuth0Id($this->currentUser->id());
+    $result = $this->auth0Service->createSendVerificationEmail($auth0Id);
+    if ($result) {
+      $this->messenger()->addMessage($this->t("Verification email has been sent. Please check your inbox and follow the instructions to verify your email. If you don't see it, check your spam or junk folder."));
+    }
+    else {
+      $this->messenger()->addError($this->t('An error occurred while attempting to send the verification email. Please try again or contact support at support@gilderlehrman.org for assistance.'));
+    }
+
+    // @todo check if route or module exists
+    return $this->redirect('gli_user_dashboard.self');
   }
 
 }
