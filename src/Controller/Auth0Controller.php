@@ -231,8 +231,12 @@ final class Auth0Controller extends ControllerBase {
       $this->messenger()->addError($this->t('An error occurred while attempting to send the verification email. Please try again or contact support at support@gilderlehrman.org for assistance.'));
     }
 
-    // @todo check if route or module exists
-    return $this->redirect('gli_user_dashboard.self');
+    if ($this->moduleHandler->moduleExists('gli_user_dashboard')) {
+      return $this->redirect('gli_user_dashboard.self');
+    }
+    else {
+      return $this->redirect('<front>');
+    }
   }
 
 }

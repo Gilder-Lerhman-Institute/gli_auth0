@@ -576,5 +576,4 @@ class Auth0Service {
     return FALSE;
   }
 
-
 }
