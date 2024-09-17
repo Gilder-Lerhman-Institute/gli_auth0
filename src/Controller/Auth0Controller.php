@@ -55,7 +55,7 @@ final class Auth0Controller extends ControllerBase {
    *
    * @var \Drupal\Core\Session\AccountProxyInterface
    */
-  protected $currentUser;
+  protected AccountProxyInterface $currentUser;
 
   /**
    * {@inheritdoc}

@@ -568,12 +568,9 @@ class Auth0Service {
    */
   public function createSendVerificationEmail(string $auth0Id): bool {
     $response = $this->getManager()->management()->jobs()->createSendVerificationEmail($auth0Id);
-    if ($response->getStatusCode() == 201) {
-      // Job successfully created.
-      // @see https://auth0.com/docs/api/management/v2/jobs/post-verification-email
-      return TRUE;
-    }
-    return FALSE;
+    // 201 = Job successfully created.
+    // @see https://auth0.com/docs/api/management/v2/jobs/post-verification-email
+    return $response->getStatusCode() == 201;
   }
 
 }
