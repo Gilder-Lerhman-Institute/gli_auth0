@@ -51,13 +51,6 @@ final class Auth0Controller extends ControllerBase {
   protected RequestStack $requestStack;
 
   /**
-   * Drupal\Core\Session\AccountProxy definition.
-   *
-   * @var \Drupal\Core\Session\AccountProxyInterface
-   */
-  protected AccountProxyInterface $currentUser;
-
-  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
@@ -65,8 +58,7 @@ final class Auth0Controller extends ControllerBase {
       $container->get('gli_auth0'),
       $container->get('page_cache_kill_switch'),
       $container->get('event_dispatcher'),
-      $container->get('request_stack'),
-      $container->get('current_user')
+      $container->get('request_stack')
     );
   }
 
@@ -80,22 +72,17 @@ final class Auth0Controller extends ControllerBase {
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
    *   Event Dispatcher Service.
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
-   *   Request Stack Service.
-   * @param \Drupal\Core\Session\AccountProxyInterface $currentUser
-   *   Drupal\Core\Session\AccountProxy definition.
    */
   public function __construct(
     Auth0Service $auth0Service,
     KillSwitch $killSwitch,
     EventDispatcherInterface $eventDispatcher,
-    RequestStack $requestStack,
-    AccountProxyInterface $currentUser
+    RequestStack $requestStack
   ) {
     $this->auth0Service = $auth0Service;
     $this->killSwitch = $killSwitch;
     $this->eventDispatcher = $eventDispatcher;
     $this->requestStack = $requestStack;
-    $this->currentUser = $currentUser;
   }
 
   /**
@@ -222,7 +209,7 @@ final class Auth0Controller extends ControllerBase {
    * Create job to send verification email.
    */
   public function verifyEmail() {
-    $auth0Id = $this->auth0Service->getUserAuth0Id($this->currentUser->id());
+    $auth0Id = $this->auth0Service->getUserAuth0Id($this->currentUser()->id());
     $result = $this->auth0Service->createSendVerificationEmail($auth0Id);
     if ($result) {
       $this->messenger()->addMessage($this->t("Verification email has been sent. Please check your inbox and follow the instructions to verify your email. If you don't see it, check your spam or junk folder."));
