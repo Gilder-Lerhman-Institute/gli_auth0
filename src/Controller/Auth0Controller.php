@@ -5,7 +5,6 @@ namespace Drupal\gli_auth0\Controller;
 use Auth0\SDK\Exception\StateException;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\PageCache\ResponsePolicy\KillSwitch;
-use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\Url;
 use Drupal\gli_auth0\Event\AuthenticationEvent;
 use Drupal\gli_auth0\Event\GLIAuth0Events;
@@ -72,6 +71,7 @@ final class Auth0Controller extends ControllerBase {
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
    *   Event Dispatcher Service.
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   *   Request Stack Service.
    */
   public function __construct(
     Auth0Service $auth0Service,
@@ -218,7 +218,7 @@ final class Auth0Controller extends ControllerBase {
       $this->messenger()->addError($this->t('An error occurred while attempting to send the verification email. Please try again or contact support at support@gilderlehrman.org for assistance.'));
     }
 
-    if ($this->moduleHandler->moduleExists('gli_user_dashboard')) {
+    if ($this->moduleHandler()->moduleExists('gli_user_dashboard')) {
       return $this->redirect('gli_user_dashboard.self');
     }
     else {
