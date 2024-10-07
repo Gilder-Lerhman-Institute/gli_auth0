@@ -557,4 +557,20 @@ class Auth0Service {
     return ($auth0User['app_metadata']['salesforce_id'] ?? '');
   }
 
+  /**
+   * Create job to send verification email.
+   *
+   * @param string $auth0Id
+   *   Auth0 ID.
+   *
+   * @return bool
+   *   Return true if successful, false if issues.
+   */
+  public function createSendVerificationEmail(string $auth0Id): bool {
+    $response = $this->getManager()->management()->jobs()->createSendVerificationEmail($auth0Id);
+    // 201 = Job successfully created.
+    // @see https://auth0.com/docs/api/management/v2/jobs/post-verification-email
+    return $response->getStatusCode() == 201;
+  }
+
 }

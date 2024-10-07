@@ -205,4 +205,25 @@ final class Auth0Controller extends ControllerBase {
     return $response;
   }
 
+  /**
+   * Create job to send verification email.
+   */
+  public function verifyEmail() {
+    $auth0Id = $this->auth0Service->getUserAuth0Id($this->currentUser()->id());
+    $result = $this->auth0Service->createSendVerificationEmail($auth0Id);
+    if ($result) {
+      $this->messenger()->addMessage($this->t("Verification email has been sent. Please check your inbox and follow the instructions to verify your email. If you don't see it, check your spam or junk folder."));
+    }
+    else {
+      $this->messenger()->addError($this->t('An error occurred while attempting to send the verification email. Please try again or contact support at support@gilderlehrman.org for assistance.'));
+    }
+
+    if ($this->moduleHandler()->moduleExists('gli_user_dashboard')) {
+      return $this->redirect('gli_user_dashboard.self');
+    }
+    else {
+      return $this->redirect('<front>');
+    }
+  }
+
 }
