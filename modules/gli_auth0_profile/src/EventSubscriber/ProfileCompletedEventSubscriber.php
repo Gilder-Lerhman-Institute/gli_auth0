@@ -114,7 +114,7 @@ class ProfileCompletedEventSubscriber implements EventSubscriberInterface {
       return;
     }
 
-    $is_ajax = $this->request->headers->get('X_REQUESTED_WITH') === 'XMLHttpRequest';
+    $is_ajax = $this->request->isXmlHttpRequest();
 
     // There needs to be an explicit check for non-anonymous or else
     // this will be tripped and a forced redirect will occur.
