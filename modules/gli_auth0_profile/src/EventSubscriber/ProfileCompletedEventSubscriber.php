@@ -99,6 +99,7 @@ class ProfileCompletedEventSubscriber implements EventSubscriberInterface {
       'user.logout',
       'admin_toolbar_tools.flush',
       'user.pass',
+      'media.oembed_iframe',
       // Contrib Routes:
       // 'user_current_paths.edit_redirect',
       // Gli Auth0 Routes:
