@@ -99,6 +99,7 @@ class ProfileCompletedEventSubscriber implements EventSubscriberInterface {
       'user.logout',
       'admin_toolbar_tools.flush',
       'user.pass',
+      'media.oembed_iframe',
       // Contrib Routes:
       // 'user_current_paths.edit_redirect',
       // Gli Auth0 Routes:
@@ -114,7 +115,7 @@ class ProfileCompletedEventSubscriber implements EventSubscriberInterface {
       return;
     }
 
-    $is_ajax = $this->request->headers->get('X_REQUESTED_WITH') === 'XMLHttpRequest';
+    $is_ajax = $this->request->isXmlHttpRequest();
 
     // There needs to be an explicit check for non-anonymous or else
     // this will be tripped and a forced redirect will occur.
