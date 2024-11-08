@@ -37,6 +37,16 @@
         childList: true
       });
 
+      const resizeObserver = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          // Scroll up when the form is updated.
+          if (window.scrollY > 0) {
+            window.scrollTo({ top: 0 });
+          }
+        }
+      });
+      resizeObserver.observe(document.querySelector('#container'));
+
       const init = function () {
         $Lightning.use(drupalSettings.gli_auth0_profile_registration.app_name,
           function () {
