@@ -37,11 +37,17 @@
         childList: true
       });
 
+      let previousHeight = 96;
       const resizeObserver = new ResizeObserver((entries) => {
         for (const entry of entries) {
-          // Scroll up when the form is updated.
-          if (window.scrollY > 0) {
-            window.scrollTo({ top: 0 });
+          if (entry.contentBoxSize) {
+            // Scroll up when the form is updated. Only trigger the scroll on
+            // large layout shifts.
+            const newHeight = entry.contentBoxSize[0]?.blockSize ?? 0;
+            if (Math.abs(previousHeight - newHeight) > 900 && window.scrollY > 0) {
+              window.scrollTo({ top: 0 });
+            }
+            previousHeight = newHeight;
           }
         }
       });
