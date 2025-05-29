@@ -72,6 +72,10 @@
       }
 
       document.addEventListener("registration_complete", () => {
+        const registrationForm = document.querySelector('#registration-form');
+        if (registrationForm) {
+          registrationForm.classList.add('registration-complete');
+        }
         Drupal.gliAuth0Profile.setRedirect(drupalSettings.gli_auth0_profile_registration.redirect_url ?? '/');
       });
     }
