@@ -127,19 +127,34 @@ function gli_auth0_profile_password_update(array $form, FormStateInterface $form
  * Implements hook_auth0_callback_url_alter().
  */
 function gli_auth0_profile_auth0_callback_url_alter(Url &$url, array $data = []) {
+  // Auth0 app_metadata is the priority check.
   if (!isset($data['data']['auth0User'])) {
     return;
   }
   $auth0User = $data['data']['auth0User'];
-  $registration_complete = isset($auth0User['app_metadata']['registration_complete']);
-
-  if ($registration_complete) {
+  if (isset($auth0User['app_metadata']['registration_complete'])) {
     return;
   }
 
-  $url = gli_auth0_profile_get_registration_url(
-    $url->toString()
-  );
+  // Auth0 says incomplete — split by flow.
+  if (\Drupal::moduleHandler()->moduleExists('gli_registration')) {
+    // New flow: check local userData flag (provisional completion).
+    $config = \Drupal::config('gli_registration.settings');
+    if ($config->get('allow_registered_users')) {
+      return;
+    }
+    $uid = \Drupal::currentUser()->id();
+    if ($uid) {
+      $completed = \Drupal::service('user.data')->get('gli_registration', $uid, 'completed');
+      if (!$completed) {
+        $url = Url::fromRoute('gli_registration.form', [], ['https' => TRUE]);
+      }
+    }
+  }
+  else {
+    // Legacy flow.
+    $url = gli_auth0_profile_get_registration_url($url->toString());
+  }
 }
 
 /**
