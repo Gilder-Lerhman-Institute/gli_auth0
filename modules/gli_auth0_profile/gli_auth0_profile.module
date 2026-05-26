@@ -140,7 +140,7 @@ function gli_auth0_profile_auth0_callback_url_alter(Url &$url, array $data = [])
   if (\Drupal::moduleHandler()->moduleExists('gli_registration')) {
     // New flow: check local userData flag (provisional completion).
     $config = \Drupal::config('gli_registration.settings');
-    if ($config->get('allow_registered_users')) {
+    if ($config->get('testing_mode') && $config->get('allow_registered_users')) {
       return;
     }
     $uid = \Drupal::currentUser()->id();

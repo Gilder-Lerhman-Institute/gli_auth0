@@ -186,7 +186,7 @@ class ProfileCompletedEventSubscriber implements EventSubscriberInterface {
         if ($this->moduleHandler && $this->moduleHandler->moduleExists('gli_registration')) {
           // New flow: check local userData flag (provisional completion).
           $config = $this->configFactory->get('gli_registration.settings');
-          if ($config->get('allow_registered_users')) {
+          if ($config->get('testing_mode') && $config->get('allow_registered_users')) {
             return;
           }
           $completed = $this->userData->get('gli_registration', $this->currentUser->id(), 'completed');

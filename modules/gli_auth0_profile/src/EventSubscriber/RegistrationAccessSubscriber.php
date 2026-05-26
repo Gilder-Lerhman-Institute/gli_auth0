@@ -73,7 +73,7 @@ class RegistrationAccessSubscriber implements EventSubscriberInterface {
     }
 
     $config = $this->configFactory->get('gli_registration.settings');
-    if ($config->get('allow_registered_users')) {
+    if ($config->get('testing_mode') && $config->get('allow_registered_users')) {
       return;
     }
 
