@@ -148,6 +148,13 @@ class ProfileCompletedEventSubscriber implements EventSubscriberInterface {
       'gli_registration.form',
     ]);
 
+    // TODO: Move this list to a configuration setting so site admins can
+    // manage the paths that bypass the registration redirect.
+    $ignore_path = in_array($this->request->getPathInfo(), [
+      '/privacy-policy',
+      '/technical-support',
+    ]);
+
     // Ignore route for jsonapi calls.
     if (strpos($route_name, 'jsonapi') !== FALSE) {
       return;
@@ -157,7 +164,7 @@ class ProfileCompletedEventSubscriber implements EventSubscriberInterface {
 
     // There needs to be an explicit check for non-anonymous or else
     // this will be tripped and a forced redirect will occur.
-    if ($this->currentUser->isAuthenticated() && !$ignore_route && !$is_ajax) {
+    if ($this->currentUser->isAuthenticated() && !$ignore_route && !$ignore_path && !$is_ajax) {
 
       // Bail early if the current user is masquerading. Masquerade should not
       // force a password reset.
