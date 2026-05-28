@@ -7,6 +7,21 @@ services:
       - '@request_stack'
       - '@messenger'
       - '@?masquerade'
+      - '@module_handler'
+      - '@user.data'
+      - '@config.factory'
+    tags:
+      - { name: event_subscriber }
+  gli_auth0_profile.registration_access_subscriber:
+    class: Drupal\gli_auth0_profile\EventSubscriber\RegistrationAccessSubscriber
+    arguments:
+      - '@current_user'
+      - '@gli_auth0'
+      - '@request_stack'
+      - '@messenger'
+      - '@user.data'
+      - '@config.factory'
+      - '@module_handler'
     tags:
       - { name: event_subscriber }
   gli_auth0_profile.route_subscriber:
