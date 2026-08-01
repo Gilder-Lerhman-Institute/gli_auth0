@@ -13,10 +13,20 @@ use Drupal\user\UserInterface;
 function gli_auth0_roles_sync_user_login(UserInterface $account) {
   /** @var \Drupal\gli_auth0\Service\Auth0Service $auth0 */
   $auth0 = \Drupal::service('gli_auth0');
+  $masquerade = \Drupal::hasService('masquerade') ? \Drupal::service('masquerade') : NULL;
+  $update_roles = FALSE;
 
   $auth0Id = $auth0->getUserAuth0Id($account->id());
   if ($auth0Id !== NULL) {
-    $auth0->updateUserRoles($auth0Id);
+    $update_roles = TRUE;
   }
 
+  if ($masquerade && $masquerade->isMasquerading()) {
+    // Skip updating roles when masquerading.
+    $update_roles = FALSE;
+  }
+
+  if ($update_roles) {
+    $auth0->updateUserRoles($auth0Id);
+  }
 }

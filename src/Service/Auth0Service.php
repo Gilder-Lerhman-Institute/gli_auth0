@@ -466,19 +466,21 @@ class Auth0Service {
       // Keep track if we should save the user.
       $save = FALSE;
 
-      // Loop through all currently mapped roles and remove them from the user.
-      foreach ($mappedDrupalRoles as $drupalRole) {
-        if ($user->hasRole($drupalRole)) {
-          $save = TRUE;
-          $user->removeRole($drupalRole);
+      if (!empty($auth0UserRoles)) {
+        // Loop through all currently mapped roles and remove them from the user.
+        foreach ($mappedDrupalRoles as $drupalRole) {
+          if ($user->hasRole($drupalRole)) {
+            $save = TRUE;
+            $user->removeRole($drupalRole);
+          }
         }
-      }
 
-      // Loop through all the Auth0 Roles and apply them to the user.
-      foreach ($auth0UserRoles as $roleId) {
-        if (!empty($roleMapping[$roleId])) {
-          $save = TRUE;
-          $user->addRole($roleMapping[$roleId]);
+        // Loop through all the Auth0 Roles and apply them to the user.
+        foreach ($auth0UserRoles as $roleId) {
+          if (!empty($roleMapping[$roleId])) {
+            $save = TRUE;
+            $user->addRole($roleMapping[$roleId]);
+          }
         }
       }
 
