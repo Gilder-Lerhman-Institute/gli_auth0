@@ -3,6 +3,7 @@
 namespace Drupal\gli_auth0\Form;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -34,10 +35,11 @@ final class Auth0Settings extends ConfigFormBase {
    */
   public function __construct(
     ConfigFactoryInterface $config_factory,
+    TypedConfigManagerInterface $typedConfigManager,
     Auth0Service $auth0Service,
     EntityTypeManagerInterface $entityTypeManager
   ) {
-    parent::__construct($config_factory);
+    parent::__construct($config_factory, $typedConfigManager);
     $this->auth0Service = $auth0Service;
     $this->entityTypeManager = $entityTypeManager;
   }
@@ -48,6 +50,7 @@ final class Auth0Settings extends ConfigFormBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('config.factory'),
+      $container->get('config.typed'),
       $container->get('gli_auth0'),
       $container->get('entity_type.manager')
     );

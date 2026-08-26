@@ -106,10 +106,10 @@ class ProfileCompletedEventSubscriber implements EventSubscriberInterface {
     Auth0Service $auth0Service,
     RequestStack $requestStack,
     MessengerInterface $messenger,
-    $masquerade = NULL,
-    ModuleHandlerInterface $module_handler = NULL,
-    UserDataInterface $user_data = NULL,
-    ConfigFactoryInterface $config_factory = NULL
+    $masquerade,
+    ModuleHandlerInterface $module_handler,
+    UserDataInterface $user_data,
+    ConfigFactoryInterface $config_factory
   ) {
     $this->currentUser = $currentUser;
     $this->auth0Service = $auth0Service;
@@ -183,7 +183,7 @@ class ProfileCompletedEventSubscriber implements EventSubscriberInterface {
 
       $registration_complete = $this->auth0Service->isRegistrationComplete($auth0Id);
       if (!$registration_complete) {
-        if ($this->moduleHandler && $this->moduleHandler->moduleExists('gli_registration')) {
+        if ($this->moduleHandler->moduleExists('gli_registration')) {
           // New flow: check local userData flag (provisional completion).
           $config = $this->configFactory->get('gli_registration.settings');
           if ($config->get('testing_mode') && $config->get('allow_registered_users')) {

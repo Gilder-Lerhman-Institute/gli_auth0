@@ -51,7 +51,7 @@ final class ProfileController extends ControllerBase {
   /**
    * Profile Title.
    */
-  public function profileTitle(UserInterface $user = NULL) {
+  public function profileTitle(?UserInterface $user = NULL) {
     if (empty($user->auth0_id) || !isset($user->auth0_id)) {
       return $user ? ['#markup' => $user->getDisplayName(), '#allowed_tags' => Xss::getHtmlTagList()] : '';
     }
